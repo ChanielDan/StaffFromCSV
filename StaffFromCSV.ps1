@@ -2,13 +2,12 @@
 AUTHOR  : Daniel Chan 
 DATE    : 20-07-2015
 COMMENT : This script creates new AD Users and Office365 users
-VERSION : 2.42
+VERSION : 2.51
 
 CHANGELOG
-Version 2.42 20-07-15
-- Fixed bug 
-- Added loop to check if user has replicated to all DCs before adding ACLs for home directory
-- Added FirstName/LastName variables for email addresses which are lowercase
+Version 2.51 20-07-15
+- Added CSV check
+- Added confirmation at end of script run
 #>
 #----------------------------------------------------------
 # LOAD ASSEMBLIES AND MODULES
@@ -25,8 +24,13 @@ Catch
 }
 
 #Variables
+$InputCSV = "C:\Scripts\UserCreation\NewStaff.csv"
+$OutputCSV = "C:\Scripts\UserCreation\csv\Output.csv"
 
-$CSV = Import-Csv "C:\Scripts\UserCreation\NewStaff.csv"
+if (test-path $InputCSV) {$CSV = Import-CSV $InputCSV }
+else {Write-Output "$InputCSV doesn't exist, stopping script! Did you enter the correct CSV path?"}
+
+
 $Credential = Get-Credential -Message "Please enter Office365 Administrative Email and Password"
 
 
@@ -110,7 +114,9 @@ New-Object -TypeName PSCustomObject -Property @{
     Username = $samaccountname
     EmailAddress = $emailaddress
     Password = $password
-} | Export-Csv -Path C:\Scripts\UserCreation\csv\CreatedUsers.csv -NoTypeInformation -Append
+} | Export-Csv -Path $OutputCSV -NoTypeInformation -Append
+
+Write-Host "Completed script, see $OutputCSV for user details." 
 
 }
 
