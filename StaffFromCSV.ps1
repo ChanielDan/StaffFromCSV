@@ -2,13 +2,14 @@
 AUTHOR  : Daniel Chan 
 DATE    : 20-07-2015
 COMMENT : This script creates new AD Users and Office365 users
-VERSION : 2.51
+VERSION : 2.52
 
 CHANGELOG
-Version 2.51 20-07-15
-- Added CSV check
+Version 2.52 20-07-15
+- Added CSV check, stop if incorrect path
 - Added confirmation at end of script run
 #>
+
 #----------------------------------------------------------
 # LOAD ASSEMBLIES AND MODULES
 #----------------------------------------------------------
@@ -24,15 +25,19 @@ Catch
 }
 
 #Variables
-$InputCSV = "C:\Scripts\UserCreation\NewStaff.csv"
+
+$InputCSV = "C:\Scripts\UserCreation\wwewaesaad.csv"
+
+#This is where the script will save the CSV with user details
 $OutputCSV = "C:\Scripts\UserCreation\csv\Output.csv"
 
 if (test-path $InputCSV) {$CSV = Import-CSV $InputCSV }
-else {Write-Output "$InputCSV doesn't exist, stopping script! Did you enter the correct CSV path?"}
-
+else {
+    Write-Host "[ERROR]`t $InputCSV doesn't exist, stopping script! Did you enter the correct CSV path?"
+    Exit 1
+     }
 
 $Credential = Get-Credential -Message "Please enter Office365 Administrative Email and Password"
-
 
 ForEach ($line in $CSV) {
 
